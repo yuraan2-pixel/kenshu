@@ -1,0 +1,98 @@
+CREATE TABLE 口座 (
+口座番号 CHAR(7) PRIMARY KEY,
+名義    VARCHAR(40) NOT NULL,
+種別    CHAR(1) NOT NULL,
+残高    INTEGER CHECK (残高 >= 0),
+更新日  DATE
+);
+
+CREATE TABLE 廃止口座 (
+口座番号  CHAR(7) PRIMARY KEY,
+名義      VARCHAR(40) NOT NULL,
+種別      CHAR(1) NOT NULL,
+解約時残高 INTEGER CHECK (解約時残高 >= 0),
+更新日    DATE
+);
+
+CREATE TABLE 取引 (
+取引番号 INTEGER PRIMARY KEY,
+取引事由ID INTEGER REFERENCES 取引事由,
+日付 DATE NOT NULL,
+口座番号 CHAR(7) NOT NULL,
+入金額 INTEGER,
+出金額 INTEGER
+);
+
+CREATE TABLE 取引事由 (
+取引事由ID INTEGER PRIMARY KEY,
+取引事由名 VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE PRODUCT (
+商品コード CHAR(3) PRIMARY KEY,
+商品名 VARCHAR(20),
+単価 NUMBER
+);
+
+-----Chapter2-----
+
+SELECT 口座番号,名義,種別,残高,更新日 FROM 口座;
+SELECT 口座番号 FROM 口座;
+SELECT 口座番号,残高 FROM 口座;
+SELECT * FROM 口座;
+--UPDATE 口座 SET 名義 = 'X X X X X';
+--UPDATE 口座 SET 残高 = 99999999, 更新日 = '2024-03-01';
+--INSERT INTO 口座 VALUES ('0642191', 'アオキ　ハルカ', 1, 3640551, '2024-03-13');
+--INSERT INTO 口座 VALUES ('1039410', 'キノシタ　リュウジ', 1, 259017, '2023-11-30');
+--INSERT INTO 口座 VALUES ('1239855', 'タカシナ　ミツル', 2, 6509773, '');
+--DELETE FROM 口座;
+
+-----Chapter3-----
+
+SELECT * FROM 口座 WHERE 口座番号 = 0037651;
+SELECT * FROM 口座 WHERE 残高 > 0;
+SELECT * FROM 口座 WHERE 口座番号 <= 1000000;
+SELECT * FROM 口座 WHERE 更新日 <= '23-12-31';
+SELECT * FROM 口座 WHERE 残高 >= 1000000;
+SELECT * FROM 口座 WHERE 種別 != 1;
+SELECT * FROM 口座 WHERE 更新日 IS NULL;
+SELECT * FROM 口座 WHERE 名義 LIKE '%ハシ%';
+SELECT * FROM 口座 WHERE 更新日 LIKE '24-01-%';
+SELECT * FROM 口座 WHERE 種別 != 1;
+SELECT * FROM 口座 WHERE 名義 = 'サカタ　リョウヘイ'
+OR 名義 = 'マツモト　ミワコ' OR 名義 = 'ハマダ　サトシ';
+SELECT * FROM 口座 WHERE 更新日 BETWEEN '23-12-30' AND '24-01-04';
+SELECT * FROM 口座 WHERE 残高 < 10000 AND 更新日 IS NOT NULL;
+SELECT * FROM 口座 WHERE 口座番号 >= 2000000 AND 口座番号 < 3000000
+OR 名義 LIKE 'エ__%コ';
+
+-----Chapter4-----
+
+SELECT * FROM 口座 ORDER BY 更新日;
+SELECT DISTINCT 名義 FROM 口座 ORDER BY "名義";
+SELECT * FROM 口座 ORDER BY 4 DESC , 1 DESC;
+SELECT 更新日 FROM 口座 WHERE 更新日 IS NOT NULL
+    ORDER BY 1 OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY;
+SELECT 更新日, 残高 FROM 口座 WHERE "残高" != 0 AND 更新日 IS NOT NULL
+    ORDER BY "残高" , "更新日" DESC OFFSET 10 ROWS FETCH NEXT 10 ROWS ONLY; 
+SELECT 口座番号 FROM 口座 UNION SELECT 口座番号 FROM 廃止口座 ORDER BY 口座番号;
+SELECT 名義 FROM 口座 MINUS SELECT 名義 FROM 廃止口座 ORDER BY 名義;
+SELECT 名義 FROM 口座 INTERSECT SELECT 名義 FROM 廃止口座 ORDER BY 名義;
+SELECT 口座番号, 残高 FROM 口座 WHERE 残高 != 0 UNION
+    SELECT 口座番号, 残高 FROM 廃止口座 WHERE 解約時残高 != 0 ORDER BY 口座番号;
+
+-----Chapter5-----
+
+
+
+
+--SELECT TABLE_NAME, COLUMN_NAME 
+--FROM USER_CONS_COLUMNS 
+--WHERE CONSTRAINT_NAME = 'SYS_C007433';
+--
+--SELECT * FROM 口座 WHERE 口座番号 = '0037651';
+
+--INSERT INTO PRODUCT VALUES('001', 'りんご', 150);
+--INSERT INTO 廃止口座 VALUES ('0051432', 'オダ　シンタロウ', 1, 41310, '2023-12-24');
+--INSERT INTO 取引 VALUES (1, 9, '2022-01-05', '0051432', 0, 41310);
+--INSERT INTO 取引事由 VALUES (9, 'その他');
